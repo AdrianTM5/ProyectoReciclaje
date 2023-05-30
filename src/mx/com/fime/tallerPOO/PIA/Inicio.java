@@ -15,6 +15,7 @@ public class Inicio extends JFrame
 {
 
 	private JPanel contentPane;
+	Thread ThreadI;
 	JButton PapelBtn;
 	JButton PlasticoBtn;
 	JButton CartonBtn;
@@ -22,23 +23,24 @@ public class Inicio extends JFrame
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
+	void lanzar(){
+		ThreadI = new Thread(new Runnable() {
 			public void run() {
 				try {
-					Inicio frame = new Inicio();
-					frame.setVisible(true);
+					setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
+		ThreadI.start();
 	}
 
 	/**
 	 * Create the frame.
 	 */
 	public Inicio() {
+		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 500, 400);
 		contentPane = new JPanel();
