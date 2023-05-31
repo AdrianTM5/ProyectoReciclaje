@@ -2,25 +2,31 @@ package mx.com.fime.tallerPOO.PIA;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class Controlador implements ActionListener
 {
 	Inicio ini;
 	InfoGUI infoG;
-	Controlador con;
+	Modelo mod;
+	Controlador cont;
+	Connection con;
 	Bascula bas = new Bascula();
 	
-	public Controlador(Inicio ini, InfoGUI infoG) 
+	public Controlador(Inicio ini, InfoGUI infoG, Modelo mod) 
 	{
 		this.ini = ini;
 		this.infoG = infoG;
+		this.mod = mod;
 		arrancar();
 	}
 	
 	private void arrancar()
 	{
 		ini.lanzar();
-		while(ini.ThreadI.isAlive() == true)
+		while(ini.ThreadI.isAlive() == true && infoG.ThreadII.isAlive() == true)
 		{
 			try {
 				Thread.sleep(100);
@@ -113,5 +119,19 @@ public class Controlador implements ActionListener
 		infoG.PesoTextField.setText(bas.peso+" kg");
 		
 		infoG.TotalTextField.setText(bas.peso * valorMate+"");
+	}
+	
+	void conectar(String usr, String pw)
+	{
+		String server = "jdbc:mysql://localhost/proyectoreciclaje";
+		usr = "Adri_TM5";
+		pw = "Mario654321!";
+		
+		try 
+		{
+			con = DriverManager.getConnection(server,usr,pw);
+			
+		} 
+		catch (SQLException e) {}
 	}
 }

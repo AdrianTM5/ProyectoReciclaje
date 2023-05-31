@@ -6,8 +6,9 @@ public class Lanzador
 	{
 		Inicio ini = new Inicio();
 		InfoGUI infG = new InfoGUI();
+		Modelo mod = new Modelo();
 		
 		
-		Controlador co = new Controlador(ini, infG);
+		Controlador co = new Controlador(ini, infG, mod);
 	}
 }
