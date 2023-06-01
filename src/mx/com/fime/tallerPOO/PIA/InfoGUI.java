@@ -14,6 +14,7 @@ import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.DropMode;
+import javax.swing.JButton;
 
 public class InfoGUI extends JFrame 
 {
@@ -28,9 +29,9 @@ public class InfoGUI extends JFrame
 	JTextField ValorTextField;
 	JTextField TotalTextField;
 	JTextField PesoTextField;
-	JLabel CalculandoLabel;
 	JLabel IndicacionLabel;
 	JLabel PesoLabel;
+	JButton AceptarBtn;
 	
 	
 
@@ -71,13 +72,6 @@ public class InfoGUI extends JFrame
 		contentPane.add(panelBascula);
 		panelBascula.setLayout(null);
 		
-		CalculandoLabel = new JLabel("Calculando...");
-		CalculandoLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		CalculandoLabel.setFont(new Font("Yu Gothic Medium", Font.BOLD, 28));
-		CalculandoLabel.setBounds(10, 11, 248, 275);
-		panelBascula.add(CalculandoLabel);
-		CalculandoLabel.setVisible(false);
-		
 		PesoLabel = new JLabel("El peso es de:");
 		PesoLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		PesoLabel.setFont(new Font("Yu Gothic Medium", Font.BOLD, 14));
@@ -111,35 +105,44 @@ public class InfoGUI extends JFrame
 		
 		MaterialLabel = new JLabel("Material:");
 		MaterialLabel.setFont(new Font("Yu Gothic Medium", Font.PLAIN, 12));
-		MaterialLabel.setBounds(10, 77, 49, 24);
+		MaterialLabel.setBounds(10, 35, 49, 24);
 		panelDatos.add(MaterialLabel);
 		
 		MaterialTextField = new JTextField();
+		MaterialTextField.setHorizontalAlignment(SwingConstants.LEFT);
 		MaterialTextField.setEditable(false);
-		MaterialTextField.setBounds(66, 76, 76, 20);
+		MaterialTextField.setBounds(66, 34, 76, 20);
 		panelDatos.add(MaterialTextField);
 		MaterialTextField.setColumns(10);
 		
 		ValorLabel = new JLabel("Valor:");
 		ValorLabel.setFont(new Font("Yu Gothic Medium", Font.PLAIN, 12));
-		ValorLabel.setBounds(21, 124, 38, 24);
+		ValorLabel.setBounds(21, 82, 38, 24);
 		panelDatos.add(ValorLabel);
 		
 		ValorTextField = new JTextField();
+		ValorTextField.setHorizontalAlignment(SwingConstants.LEFT);
 		ValorTextField.setEditable(false);
 		ValorTextField.setColumns(10);
-		ValorTextField.setBounds(66, 123, 76, 20);
+		ValorTextField.setBounds(66, 81, 76, 20);
 		panelDatos.add(ValorTextField);
 		
 		TotalLabel = new JLabel("Total:");
 		TotalLabel.setFont(new Font("Yu Gothic Medium", Font.PLAIN, 12));
-		TotalLabel.setBounds(21, 173, 38, 24);
+		TotalLabel.setBounds(21, 131, 38, 24);
 		panelDatos.add(TotalLabel);
 		
 		TotalTextField = new JTextField();
+		TotalTextField.setHorizontalAlignment(SwingConstants.LEFT);
 		TotalTextField.setEditable(false);
-		TotalTextField.setColumns(10);
-		TotalTextField.setBounds(66, 172, 76, 20);
+		TotalTextField.setColumns(4);
+		TotalTextField.setBounds(66, 130, 76, 20);
 		panelDatos.add(TotalTextField);
+		
+		AceptarBtn = new JButton("Aceptar");
+		AceptarBtn.setFont(new Font("Yu Gothic Medium", Font.PLAIN, 13));
+		AceptarBtn.setBackground(new Color(0, 255, 0));
+		AceptarBtn.setBounds(10, 218, 132, 52);
+		panelDatos.add(AceptarBtn);
 	}
 }

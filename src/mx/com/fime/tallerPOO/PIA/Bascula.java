@@ -6,7 +6,7 @@ public class Bascula //El valor de peso vendrá de una bascula, por el momento s
 	
 	double getPeso()
 	{
-		peso = 5000;
+		peso = 5435;
 		peso = peso / 1000;
 		return peso;
 	}

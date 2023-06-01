@@ -2,23 +2,33 @@ package mx.com.fime.tallerPOO.PIA;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.Statement;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import javax.imageio.plugins.tiff.GeoTIFFTagSet;
+import javax.swing.JOptionPane;
 
 public class Controlador implements ActionListener
 {
 	Inicio ini;
 	InfoGUI infoG;
+	RegistrarGUI reg;
 	Modelo mod;
 	Controlador cont;
 	Connection con;
+	java.sql.Statement st = null;
+	ResultSet rs = null;
 	Bascula bas = new Bascula();
 	
-	public Controlador(Inicio ini, InfoGUI infoG, Modelo mod) 
+	public Controlador(Inicio ini, InfoGUI infoG, RegistrarGUI reg, Modelo mod) 
 	{
 		this.ini = ini;
 		this.infoG = infoG;
+		this.reg = reg;
 		this.mod = mod;
 		arrancar();
 	}
@@ -26,6 +36,8 @@ public class Controlador implements ActionListener
 	private void arrancar()
 	{
 		ini.lanzar();
+		infoG.lanzar();
+		reg.lanzar();
 		while(ini.ThreadI.isAlive() == true && infoG.ThreadII.isAlive() == true)
 		{
 			try {
@@ -44,6 +56,8 @@ public class Controlador implements ActionListener
 		ini.CartonBtn.addActionListener(this);
 		ini.PapelBtn.addActionListener(this);
 		ini.PlasticoBtn.addActionListener(this);
+		infoG.AceptarBtn.addActionListener(this);
+		reg.btnEnviar.addActionListener(this);
 	}
 	
 	short material;
@@ -70,6 +84,94 @@ public class Controlador implements ActionListener
 			ini.dispose();
 			infoG.setVisible(true);
 			setInfo(); 
+		}
+		else if(e.getSource() == infoG.AceptarBtn)
+		{
+			if(bas.peso > 0)
+			{
+				infoG.dispose();
+				reg.setVisible(true);
+				conectar(null, null);
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(null, "Favor de pesar su material", "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+		else if(e.getSource() == reg.btnEnviar)
+		{
+			if(con != null)
+			{
+				String mat = reg.MatriculaTextField.getText();
+				String pw = reg.PasswordField.getText();
+				
+				try {
+					st = con.createStatement();
+					
+					boolean a = false, b = false, op = false;
+					for(int i = 0; i < 2; i++)
+					{
+						rs = st.executeQuery("SELECT matr_usu FROM usuarios LIMIT "+i+", 1");
+						rs.next();
+						
+						if(rs.getString("matr_usu") == mat)
+						{
+							if(op == false)
+							{
+								a = true;
+								op = true;
+							}
+						}
+					}
+					for(int i = 0; i < 2; i++)
+					{
+						rs = st.executeQuery("SELECT con_usu FROM usuarios LIMIT "+i+", 1");
+						rs.next();
+						System.out.println(rs.getString("con_usu"));
+						System.out.println(pw);
+						
+						if(rs.getString("con_usu") == pw)
+						{
+							if(op == false)
+							{
+								b = true;
+								op = true;
+							}
+						}
+					}
+					System.out.println(a);
+					System.out.println(b);
+					if(a == true && b == true)
+					{
+						reg.dispose();
+						System.out.println("1");
+//						infUsu.setVisible(true);
+					}
+					else
+					{
+						JOptionPane.showMessageDialog(null, "Credenciales erroneas", "Error", JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				finally
+				{
+					try
+					{
+						if(rs != null) rs.close();
+						if(st != null) st.close();
+					}
+					catch(SQLException e1)
+					{
+						e1.printStackTrace();
+					}
+				}
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(null, "Error al conectarse a la BD", "Error", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 	
@@ -102,15 +204,8 @@ public class Controlador implements ActionListener
 		infoG.ValorTextField.setText(valorMate+"");
 		bas.getPeso();
 		
-		//Aqui probablemente vaya un ciclo para que vayan cambiando los mensajes
 		infoG.IndicacionLabel.setVisible(false);
-		if(bas.peso > 0d)
-		{
-			infoG.CalculandoLabel.setVisible(true);
-			//Deberia haber un Threadsleep aqui para que el mensaje se quede un rato pero si lo pongo se queda en blanco
-			infoG.CalculandoLabel.setVisible(false);
-		}
-		else
+		if(bas.peso <= 0d)
 		{
 			infoG.IndicacionLabel.setVisible(true);
 		}
@@ -118,7 +213,7 @@ public class Controlador implements ActionListener
 		infoG.PesoTextField.setVisible(true);
 		infoG.PesoTextField.setText(bas.peso+" kg");
 		
-		infoG.TotalTextField.setText(bas.peso * valorMate+"");
+		infoG.TotalTextField.setText(""+bas.peso * valorMate);
 	}
 	
 	void conectar(String usr, String pw)
