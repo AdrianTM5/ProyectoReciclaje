@@ -11,6 +11,7 @@ import java.sql.SQLException;
 
 import javax.imageio.plugins.tiff.GeoTIFFTagSet;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 public class Controlador implements ActionListener
 {
@@ -18,17 +19,21 @@ public class Controlador implements ActionListener
 	InfoGUI infoG;
 	RegistrarGUI reg;
 	Modelo mod;
+	Datos dat;
 	Controlador cont;
 	Connection con;
 	java.sql.Statement st = null;
 	ResultSet rs = null;
+	PreparedStatement ps;
 	Bascula bas = new Bascula();
+	double total;
 	
-	public Controlador(Inicio ini, InfoGUI infoG, RegistrarGUI reg, Modelo mod) 
+	public Controlador(Inicio ini, InfoGUI infoG, RegistrarGUI reg, Datos dat, Modelo mod) 
 	{
 		this.ini = ini;
 		this.infoG = infoG;
 		this.reg = reg;
+		this.dat = dat;
 		this.mod = mod;
 		arrancar();
 	}
@@ -38,7 +43,8 @@ public class Controlador implements ActionListener
 		ini.lanzar();
 		infoG.lanzar();
 		reg.lanzar();
-		while(ini.ThreadI.isAlive() == true && infoG.ThreadII.isAlive() == true)
+		dat.lanzar();
+		while(ini.ThreadI.isAlive() == true && infoG.ThreadII.isAlive() == true && reg.ThreadIII.isAlive() == true)
 		{
 			try {
 				Thread.sleep(100);
@@ -100,77 +106,74 @@ public class Controlador implements ActionListener
 		}
 		else if(e.getSource() == reg.btnEnviar)
 		{
-			if(con != null)
-			{
-				String mat = reg.MatriculaTextField.getText();
-				String pw = reg.PasswordField.getText();
-				
-				try {
-					st = con.createStatement();
+			try {
+				if(con != null)
+				{
+					try {
+						st = con.createStatement();
+						rs = st.executeQuery("SELECT * FROM usuarios");
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					convertirDatos(rs);
 					
+					String mat = reg.MatriculaTextField.getText();
 					boolean a = false, b = false, op = false;
-					for(int i = 0; i < 2; i++)
+					Usuario u = null;
+					
+					for(int i = 0; i < mod.Almacen.size(); i++)
 					{
-						rs = st.executeQuery("SELECT matr_usu FROM usuarios LIMIT "+i+", 1");
-						rs.next();
-						
-						if(rs.getString("matr_usu") == mat)
+						if(op == false)
 						{
-							if(op == false)
+							if(mod.Almacen.get(i).getMatricula().equals(mat))
 							{
 								a = true;
 								op = true;
+								u = mod.Almacen.get(i);
 							}
 						}
 					}
-					for(int i = 0; i < 2; i++)
-					{
-						rs = st.executeQuery("SELECT con_usu FROM usuarios LIMIT "+i+", 1");
-						rs.next();
-						System.out.println(rs.getString("con_usu"));
-						System.out.println(pw);
-						
-						if(rs.getString("con_usu") == pw)
-						{
-							if(op == false)
-							{
-								b = true;
-								op = true;
-							}
-						}
-					}
-					System.out.println(a);
-					System.out.println(b);
-					if(a == true && b == true)
+					
+					if(a == true)
 					{
 						reg.dispose();
-						System.out.println("1");
-//						infUsu.setVisible(true);
+						dat.setVisible(true);
+						
+						//mostar los datos del usuario
+						dat.MatriculaTextField.setText(u.getMatricula());
+						dat.NombreTextField.setText(u.getNombre());
+						dat.SaldoTextField.setText(Math.round((u.getSaldo() + total))+"");
+						
+						int saldoNuevo = Integer.parseInt(dat.SaldoTextField.getText());
+						
+						try {
+							ps = con.prepareStatement("UPDATE usuarios SET sald_usu = ? WHERE usuarios.matr_usu = ?");
+							ps.setDouble(1, saldoNuevo);
+							ps.setString(2, u.getMatricula());
+							int rowsAffected = ps.executeUpdate();
+						} catch (SQLException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						
+						
 					}
-					else
-					{
-						JOptionPane.showMessageDialog(null, "Credenciales erroneas", "Error", JOptionPane.ERROR_MESSAGE);
-					}
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
 				}
-				finally
+				else
 				{
-					try
-					{
-						if(rs != null) rs.close();
-						if(st != null) st.close();
-					}
-					catch(SQLException e1)
-					{
-						e1.printStackTrace();
-					}
+					JOptionPane.showMessageDialog(null, "Error al conectarse a la BD", "Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
-			else
+			finally
 			{
-				JOptionPane.showMessageDialog(null, "Error al conectarse a la BD", "Error", JOptionPane.ERROR_MESSAGE);
+					try {
+						if(st != null) st.close();
+						if(rs != null) rs.close();
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+				}
 			}
 		}
 	}
@@ -213,10 +216,12 @@ public class Controlador implements ActionListener
 		infoG.PesoTextField.setVisible(true);
 		infoG.PesoTextField.setText(bas.peso+" kg");
 		
-		infoG.TotalTextField.setText(""+bas.peso * valorMate);
+		total = bas.peso * valorMate;
+		
+		infoG.TotalTextField.setText(Math.round(total)+"");
 	}
 	
-	void conectar(String usr, String pw)
+	private void conectar(String usr, String pw)
 	{
 		String server = "jdbc:mysql://localhost/proyectoreciclaje";
 		usr = "Adri_TM5";
@@ -228,5 +233,29 @@ public class Controlador implements ActionListener
 			
 		} 
 		catch (SQLException e) {}
+	}
+	
+	private void convertirDatos(ResultSet rs)
+	{
+		if(!mod.Almacen.isEmpty())
+		{
+			mod.Almacen.clear();
+		}
+		try {
+			while(rs.next())
+			{
+				String mat = rs.getString("matr_usu");
+				String nom = rs.getString("nom_usu");
+				double sal = rs.getDouble("sald_usu");
+				
+				Usuario usu = new Usuario(mat, nom, sal);
+				mod.Almacen.add(usu);
+			}
+		} 
+		catch (SQLException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

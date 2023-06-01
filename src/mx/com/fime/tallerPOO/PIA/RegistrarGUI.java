@@ -16,9 +16,8 @@ import javax.swing.SwingConstants;
 public class RegistrarGUI extends JFrame {
 
 	private JPanel contentPane;
-	private JLabel TituloLabel, MatriculaLabel, ContraseñaLabel;
+	private JLabel TituloLabel, MatriculaLabel;
 	JTextField MatriculaTextField;
-	JPasswordField PasswordField;
 	JButton btnEnviar;
 	Thread ThreadIII;
 	
@@ -63,23 +62,13 @@ public class RegistrarGUI extends JFrame {
 		
 		MatriculaLabel = new JLabel("Matricula:");
 		MatriculaLabel.setFont(new Font("Yu Gothic Medium", Font.PLAIN, 12));
-		MatriculaLabel.setBounds(139, 132, 65, 23);
+		MatriculaLabel.setBounds(118, 169, 65, 23);
 		getContentPane().add(MatriculaLabel);
 		
-		ContraseñaLabel = new JLabel("Contraseña:");
-		ContraseñaLabel.setFont(new Font("Yu Gothic Medium", Font.PLAIN, 12));
-		ContraseñaLabel.setBounds(125, 210, 79, 23);
-		getContentPane().add(ContraseñaLabel);
-		
 		MatriculaTextField = new JTextField();
-		MatriculaTextField.setBounds(214, 133, 136, 20);
+		MatriculaTextField.setBounds(209, 167, 136, 20);
 		getContentPane().add(MatriculaTextField);
 		MatriculaTextField.setColumns(10);
-		
-		PasswordField = new JPasswordField();
-		PasswordField.setColumns(10);
-		PasswordField.setBounds(214, 211, 136, 20);
-		getContentPane().add(PasswordField);
 		
 		btnEnviar = new JButton("Enviar");
 		btnEnviar.setBackground(new Color(0, 255, 0));

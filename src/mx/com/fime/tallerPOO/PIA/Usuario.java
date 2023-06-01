@@ -2,19 +2,17 @@ package mx.com.fime.tallerPOO.PIA;
 
 public class Usuario 
 {
-	int matricula;
-	String nombre, contraseña;
-	double saldo;
+	private String matricula, nombre, contraseña;
+	private double saldo;
 	
-	Usuario(int matricula, String nombre, String contraseña, double saldo) 
+	Usuario(String matricula, String nombre, double saldo) 
 	{
 		this.matricula = matricula;
 		this.nombre = nombre;
-		this.contraseña = contraseña;
 		this.saldo = saldo;
 	}
 
-	int getMatricula() 
+	String getMatricula() 
 	{
 		return matricula;
 	}
